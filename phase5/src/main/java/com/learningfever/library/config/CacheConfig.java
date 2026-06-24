@@ -1,0 +1,21 @@
+package com.learningfever.library.config;
+
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableCaching
+public class CacheConfig {
+
+    public static final String BOOKS_CACHE = "books";
+
+    public static final String LIBRARY_SUMMARY_CACHE = "library-summary";
+
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager(BOOKS_CACHE, LIBRARY_SUMMARY_CACHE);
+    }
+}
