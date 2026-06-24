@@ -3,6 +3,8 @@ package com.learningfever.library.service;
 import com.learningfever.library.entity.*;
 import com.learningfever.library.exception.*;
 import com.learningfever.library.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,10 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
 
+    @Autowired
+    @Lazy
+    private LoanService self;
+
     public LoanService(LoanRepository loanRepository, BookRepository bookRepository,
                        MemberRepository memberRepository) {
         this.loanRepository = loanRepository;
@@ -31,7 +37,7 @@ public class LoanService {
         int attempts = 0;
         while (true) {
             try {
-                return doBorrow(memberId, bookId);
+                return self.doBorrow(memberId, bookId);
             } catch (ObjectOptimisticLockingFailureException e) {
                 attempts++;
                 if (attempts >= MAX_RETRIES)
@@ -41,7 +47,7 @@ public class LoanService {
     }
 
     @Transactional
-    protected Loan doBorrow(Long memberId, Long bookId) {
+    public Loan doBorrow(Long memberId, Long bookId) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new DomainException("MEMBER_NOT_FOUND", "Member not found: " + memberId));
 
